@@ -28,6 +28,7 @@ namespace HogwartsInscriptions
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddSingleton<IInscriptions, Inscriptions>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -39,6 +40,9 @@ namespace HogwartsInscriptions
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors(
+                options => options.WithOrigins("*").AllowAnyMethod()
+            );
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
