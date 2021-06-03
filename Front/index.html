@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Inscripciones Hogwarts</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+        integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://unpkg.com/vee-validate@<3.0.0"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="modal is-active" v-show="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{application.id != 0 ? "Editar solicitud" : "Nueva solicitud"}}</p>
+                    <button class="delete" aria-label="close" @click="cancel()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div class="field">
+                        <label class="label">Nombres</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="text" placeholder="Nombres" :value="application.name"
+                            v-validate="'required|alpha_spaces|max:20'" name="name-input" data-vv-as="Nombres" :class="errors.has('name-input') ? 'is-danger' : ''">
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <span class="icon is-small is-right" v-show="errors.has('name-input')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                        </div>
+                        <p class="help is-danger" v-show="errors.has('name-input')">{{ errors.first('name-input') }}</p> 
+                    </div>
+
+                    <div class="field">
+                        <label class="label">Apellidos</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="text" placeholder="Apellidos" :value="application.lastName"
+                            v-validate="'required|alpha_spaces|max:20'" name="lastName-input" data-vv-as="Apellidos" :class="errors.has('lastName-input') ? 'is-danger' : ''" >
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <span class="icon is-small is-right" v-show="errors.has('lastName-input')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                        </div>
+                        <p class="help is-danger" v-show="errors.has('lastName-input')">{{ errors.first('lastName-input') }}</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">Documento de identidad</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="text" placeholder="Documento" :value="application.documentNum"
+                            v-validate="'required|numeric|max:10'" name="document-input" data-vv-as="Documento" :class="errors.has('document-input') ? 'is-danger' : ''" >
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-id-card"></i>
+                            </span>
+                            <span class="icon is-small is-right" v-show="errors.has('document-input')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                        </div>
+                        <p class="help is-danger" v-show="errors.has('document-input')">{{ errors.first('document-input') }}</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">Edad</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input" type="number" placeholder="Edad" :value="application.age"
+                            v-validate="'required|numeric|digits:2'" name="age-input" data-vv-as="Edad" :class="errors.has('age-input') ? 'is-danger' : ''" >
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-child"></i>
+                            </span>
+                            <span class="icon is-small is-right" v-show="errors.has('age-input')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                        </div>
+                        <p class="help is-danger" v-show="errors.has('age-input')">{{ errors.first('age-input') }}</p>
+                    </div>
+                    <div class="field">
+                        <label class="label">Casa</label>
+                        <p class="control has-icons-left has-icons-right">
+                            <span class="select is-fullwidth">
+                                <select v-model="application.house" v-validate="'required|min_value:1'" name="house-select" data-vv-as="Casa" :class="errors.has('house-select') ? 'is-danger' : ''" ></select>
+                                    <option value="0">Seleccionar</option>
+                                    <option value="1">Gryffindor</option>
+                                    <option value="2">Hufflepuff</option>
+                                    <option value="3">Ravenclaw</option>
+                                    <option value="4">Slytherin</option>
+                                </select>
+                            </span>
+                            <span class="icon is-small is-left">
+                                <i class="fas fa-book-open"></i>
+                            </span>
+                            <span class="icon is-small is-right" v-show="errors.has('house-select')">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                        </p>
+                        <p class="help is-danger" v-show="errors.has('house-select')">{{ errors.first('house-select') }}</p>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-success" @click="send()">Envíar</button>
+                    <button class="button is-danger" @click="cancel()">Cancelar</button>
+                </footer>
+            </div>
+        </div>
+        <section class="section">
+            <div class="container mb-2">
+                <h1 class="title">
+                    Gestión de inscripciones a Hogwarts
+                </h1>
+            </div>
+            <div class="container">
+                <button class="button is-primary is-light is-fullwidth" @click="modal = true">
+                    <span class="icon">
+                        <i class="fas fa-plus"></i>
+                    </span>
+                    <span>Nueva inscrpción</span>
+                </button>
+                <div class="table-container">
+                    <table class="table is-striped is-hoverable is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>Nombre completo aspirante</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="application in applications">
+                                <th>{{application.name + " " + application.lastName}}</th>
+                                <th>{{application.state}}</th>
+                                <th>
+                                    <p class="buttons">
+                                        <button class="button is-primary is-outlined" :disabled="application.state > 2"
+                                            @click="edit(application)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-edit"></i>
+                                            </span>
+                                        </button>
+                                        <button class="button is-danger is-outlined"
+                                            @click="deleteApplication(application)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </span>
+                                        </button>
+                                    </p>
+                                </th>
+                                <th>
+                                    <p class="buttons">
+                                        <button class="button is-link is-outlined" :disabled="application.state > 2"
+                                            @click="changeState(application, 2)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-clock"></i>
+                                            </span>
+                                        </button>
+                                        <button class="button is-success is-outlined" :disabled="application.state < 2"
+                                            @click="changeState(application, 3)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+                                        </button>
+                                        <button class="button is-warning is-outlined" :disabled="application.state < 2"
+                                            @click="changeState(application, 4)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-times"></i>
+                                            </span>
+                                        </button>
+                                    </p>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
