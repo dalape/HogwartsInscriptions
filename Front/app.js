@@ -24,6 +24,36 @@ var app = new Vue({
                 alert("Hay errores en los campos del formulario.")
                 return;
             }
+
+            if(this.application.id == 0)
+            {
+                let callFuncC = async function(apiURL) {
+                    let response = await fetch(apiURL,{method: 'POST',body: JSON.stringify(this.application)});
+                    let data = response;
+                    return data;
+                  }
+                //obtener de api
+                callFuncC('https://localhost:44377/api/inscription/create').then(data => {
+                    // Ya dentro, podemos trabajar los datos
+                    console.log(data);
+                    this.load();
+                    this.modal = false;
+                  }).catch(error => {console.log(error)});//en caso de algún error
+            }else{
+                let callFuncU = async function(apiURL) {
+                    let response = await fetch(apiURL,{method: 'POST',body: JSON.stringify(this.application)});
+                    let data = response;
+                    return data;
+                  }
+                //obtener de api
+                callFuncU('https://localhost:44377/api/inscription/update').then(data => {
+                    // Ya dentro, podemos trabajar los datos
+                    console.log(data);
+                    this.load();
+                    this.modal = false;
+                  }).catch(error => {console.log(error)});//en caso de algún error
+            }
+           
             console.log(this.application)
             this.modal = false;
         },
